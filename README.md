@@ -9,7 +9,7 @@ El archivo [session_01_ejercicios.ipynb](session_01_ejercicios.ipynb) está prep
 | Nivel | Objetivo | Implementación en el notebook |
 | --- | --- | --- |
 | 1 — Llamada básica | Enviar un mensaje y mostrar la respuesta. | Pregunta `What a REST API is.` y muestra `response.output_text`. |
-| 2 — System prompt | Dar un rol al modelo y comparar al menos dos instrucciones. | Usa `instructions` para definir un experto en estimación de proyectos con tono directo y técnico. La comparación escrita está pendiente. |
+| 2 — System prompt | Dar un rol al modelo y comparar al menos dos instrucciones. | Compara las respuestas guardadas de los niveles 2 y 3 en tono, detalle, estructura y utilidad para un producto real. El análisis está al final del notebook. |
 | 3 — Metadatos y coste | Consultar el consumo y estimar el coste de una llamada. | Muestra modelo, estado y tokens de entrada, salida y totales; calcula un coste estimado. |
 
 Los niveles 1 y 2 son obligatorios; el nivel 3 es opcional.
@@ -27,7 +27,7 @@ El notebook instala la dependencia `openai` en su primera celda de código. La s
 1. Sube `session_01_ejercicios.ipynb` a Google Colab y ábrelo.
 2. En el panel **Secretos**, crea un secreto llamado `OPENAI_API_KEY` y habilita su acceso para este notebook.
 3. Ejecuta las celdas en orden, comenzando por la instalación y la configuración.
-4. Revisa las respuestas de cada nivel y completa la comparación de instrucciones del nivel 2.
+4. Revisa las respuestas de cada nivel y la comparación de instrucciones al final del notebook. Si vuelves a ejecutar las llamadas, ajusta el análisis a las nuevas respuestas.
 
 El notebook configura el cliente así:
 
@@ -53,7 +53,9 @@ response = openai_client.responses.create(
 print(response.output_text)
 ```
 
-En el nivel 2 se añade el parámetro `instructions` para orientar el rol y el estilo de la respuesta. Para completar el ejercicio, prueba un segundo rol claramente diferente, por ejemplo un docente que explica conceptos a principiantes, manteniendo la misma pregunta. Anota los cambios de tono, detalle y estructura, y cuál sería más útil para un producto real.
+En el nivel 2 se añade el parámetro `instructions` para orientar el rol y el estilo de la respuesta. La comparación escrita aprovecha las dos instrucciones diferentes ya utilizadas en los niveles 2 y 3, manteniendo la misma pregunta y el mismo modelo. Ambos prompts asignan un rol de experto en estimación; el primero añade experiencia y un estilo directo y técnico.
+
+En las salidas guardadas, el primer prompt produce una explicación más compacta y el segundo desarrolla ejemplos, casos de uso y ventajas. El análisis propone el primero para consultas rápidas de desarrolladores y el segundo para una explicación educativa. Son observaciones de estas respuestas, no una garantía de comportamiento en nuevas ejecuciones.
 
 ## Metadatos y estimación de coste
 
@@ -71,7 +73,7 @@ La salida guardada del nivel 3 muestra 24 tokens de entrada, 437 de salida y 461
 ## Estado de la revisión
 
 - El archivo se pudo leer como JSON y contiene las instrucciones, el código y salidas guardadas de los tres niveles.
-- **Actividad pendiente:** el nivel 2 contiene una sola llamada. El nivel 3 utiliza otra instrucción similar, pero no se documenta la comparación requerida de tono, detalle, estructura y utilidad.
+- La comparación escrita del nivel 2 está documentada al final del notebook y utiliza las salidas guardadas de los dos prompts ejecutados en los niveles 2 y 3.
 - El notebook depende de `google.colab.userdata` y la instalación utiliza comandos de shell como `grep` y `tail`; para ejecutarlo en Jupyter local, especialmente en Windows, es necesario adaptar esas celdas.
 - Esta revisión fue estática: no se ejecutó el notebook ni se realizaron nuevas llamadas a la API. Las salidas guardadas no garantizan que el código actual funcione desde un entorno limpio.
 
