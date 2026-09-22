@@ -1,0 +1,40 @@
+name: Validación
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Instalar Python
+        run: uv python install 3.11
+
+      - name: Instalar dependencias
+        run: uv sync --locked --dev
+
+      - name: Validar estructura
+        run: |
+          test -f app/main.py
+          test -f app/config.py
+          test -f app/routers/estimations.py
+          test -f app/services/llm_service.py
+          test -f app/context/examples.py
+          test -f data/transcription.txt
+          test -f README.md
+          test -f .env.example
+
+      - name: Ejecutar pruebas
+        env:
+          OPENAI_API_KEY: test-key
+        run: uv run pytest
