@@ -1,3 +1,5 @@
+from typing import Any
+
 from openai import OpenAI
 
 from app.config import get_settings
@@ -23,13 +25,10 @@ Estimación:
     return "\n".join(sections)
 
 
-def generate_estimation(transcription: str) -> dict[str, str]:
-    settings = get_settings()
-
-    client = OpenAI(api_key=settings.openai_api_key)
+def build_system_prompt() -> str:
     examples_context = build_examples_context()
 
-    system_prompt = f"""
+    return f"""
 Eres un estimador de proyectos de software con experiencia en análisis,
 arquitectura, desarrollo, pruebas y despliegue.
 
@@ -51,20 +50,53 @@ de detalle:
 
 No copies los ejemplos literalmente. Adapta la estimación a los requisitos
 de la nueva transcripción.
-"""
+""".strip()
+
+
+def build_messages(transcription: str) -> list[dict[str, str]]:
+    return [
+        {
+            "role": "system",
+            "content": build_system_prompt(),
+        },
+        {
+            "role": "user",
+            "content": (
+                "Genera una estimación para esta transcripción:\n\n"
+                f"{transcription}"
+            ),
+        },
+    ]
+
+
+def create_estimation_stream(transcription: str) -> Any:
+    """
+    Inicia una respuesta de OpenAI en streaming.
+
+    El consumidor debe recorrer los chunks devueltos.
+    """
+    settings = get_settings()
+    client = OpenAI(api_key=settings.openai_api_key)
+
+    return client.chat.completions.create(
+        model=settings.openai_model,
+        messages=build_messages(transcription),
+        temperature=0.2,
+        stream=True,
+        stream_options={"include_usage": True},
+    )
+
+
+def generate_estimation(transcription: str) -> dict[str, str]:
+    """
+    Generación no streaming utilizada actualmente por FastAPI.
+    """
+    settings = get_settings()
+    client = OpenAI(api_key=settings.openai_api_key)
 
     response = client.chat.completions.create(
         model=settings.openai_model,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {
-                "role": "user",
-                "content": (
-                    "Genera una estimación para esta transcripción:\n\n"
-                    f"{transcription}"
-                ),
-            },
-        ],
+        messages=build_messages(transcription),
         temperature=0.2,
     )
 
